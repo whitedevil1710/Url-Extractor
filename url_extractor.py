@@ -3,6 +3,7 @@ import os
 import sys
 from termcolor import colored
 import subprocess
+import requests
 
 
 def banner():
@@ -20,32 +21,50 @@ class UrlExtractor:
     def __init__(self):
         self.file_path = None
         self.urls = []
-    def clear(self):
-    	subprocess.call('clear', shell=True)
-    	banner()
-	    
-	    
+
+    def set_url(self, url):
+        self.file_path = None
+        self.url=url
+        self.urls = []
+        print(colored(f"[*] URL set to {url}", "green"))
+        self.extract(url)
+
     def set_path(self, file_path):
         self.file_path = file_path
+        self.urls = []
         print(colored(f"[*] File path set to {file_path}", "green"))
+        self.extract()
 
-    def extract(self):
-        if self.file_path is None:
-            print(colored("[!] Error: File path is not set", "red"))
-            return
+    def extract(self, url=None):
+        if url is None:
+            if self.file_path is None:
+                print(colored("[!] Error: File path is not set", "red"))
+                return
 
-        if not os.path.exists(self.file_path):
-            print(colored(f"[!] Error: File {self.file_path} not found", "red"))
-            return
+            if not os.path.exists(self.file_path):
+                print(colored(f"[!] Error: File {self.file_path} not found", "red"))
+                return
 
-        with open(self.file_path) as file:
-            for line in file:
-                urls = re.findall('https?://(?:[-\w.]|(?:%[\da-fA-F]{2}))+[/\w\-\.]*(?:\?[\w\-\.\%]+=[\w\-\.\%]+)*(?:#[\w\-]+)*', line)
-                self.urls.extend(urls)
+            with open(self.file_path) as file:
+                content = file.read()
+        else:
+            try:
+                response = requests.get(url)
+                response.raise_for_status()
+                content = response.text
+            except requests.exceptions.RequestException as e:
+                print(colored(f"[!] Error: Could not fetch URL {url}: {e}", "red"))
+                return
 
-        print(colored(f"[*] Successfully extracted URLs from {self.file_path}", "green"))
+        urls = re.findall('https?://(?:[-\w.]|(?:%[\da-fA-F]{2}))+[/\w\-\.]*(?:\?[\w\-\.\%]+=[\w\-\.\%]+)*(?:#[\w\-]+)*', content)
+        self.urls.extend(urls)
 
-    def save(self, file_name="urls.txt"):
+        if url is None:
+            print(colored(f"[*] Successfully extracted URLs from {self.file_path}", "green"))
+        else:
+            print(colored(f"[*] Successfully extracted URLs from {url}", "green"))
+
+    def save(self, file_name):
         if not self.urls:
             print(colored("[!] Error: No URLs to save", "red"))
             return
@@ -55,17 +74,7 @@ class UrlExtractor:
                 f.write(u + '\n')
 
         print(colored(f"[*] Successfully saved URLs to {file_name}", "green"))
-    def help(self):
-    	print(colored("""
-	Discription: Extracrts all url available from a text file 
-	setpath :	Set the file path
-	extract :	Extract URLs from the file
-	save	: 	Save the extracted URLs to a file
-	print 	:	Print all extracted URLs
-	help	:	Show this help message
-	exit	: 	Exit the program
-	clear	: 	Clears the terminal.
-		""", "green"))
+
     def print_urls(self):
         if not self.urls:
             print(colored("[!] Error: No URLs to print", "red"))
@@ -75,6 +84,21 @@ class UrlExtractor:
         for url in self.urls:
             print(colored(url, "yellow"))
 
+    def help(self):
+        print(colored("""
+        Description: Extracts all URLs available from a text file or URL.
+        setpath: Set the file path to extract URLs from.
+        seturl: Set the URL to extract URLs from.
+        extract: Extract URLs from the file or URL.
+        save: Save the extracted URLs to a file.
+        print: Print all extracted URLs.
+        help: Show this help message.
+        exit: Exit the program.
+        """, "green"))
+
+    def clear(self):
+    	subprocess.call('clear', shell=True)
+    	banner()
 
 def main():
 	url_extractor = UrlExtractor()
@@ -89,6 +113,10 @@ def main():
 	    elif command == "extract":
 	    	url_extractor.extract()
 
+	    elif command == "seturl":
+	    	url = input(colored("Enter the url: ","cyan"))
+	    	url_extractor.set_url(url)
+		
 	    elif command == "save":
 	    	file_name = input(colored("Enter file name [Default: urls.txt]: ", "cyan")) or "urls.txt"
 	    	url_extractor.save(file_name)
