@@ -1,6 +1,6 @@
 # URL Extractor Script
 
-This is a Python script that extracts URLs from a text file and saves them to a separate file. The script is interactive, which means it can be used by running it in a terminal and entering commands.
+The URL Extractor is a Python script that extracts all URLs available from a text file or URL. This interactive script can be executed in a terminal, allowing users to enter commands and extract URLs from text files or URLs. The extracted URLs are then saved to a separate file for easy access and management. With its ability to extract all URLs from a given source, the URL Extractor is a useful tool for anyone who needs to gather and organize a large amount of URL data.
 
 ## Usage
 
@@ -18,6 +18,7 @@ python url_extractor.py
 The following commands are available:
 
 - `setpath`: Sets the file path to the input text file.
+- `seturl`: Sets URL to extract
 - `extract`: Extracts URLs from the input text file.
 - `save`: Saves the extracted URLs to a new file.
 - `print`: Prints all extracted URLs to the terminal.
@@ -31,10 +32,11 @@ The following commands are available:
 ``` 
 python url_extractor.py
 ```
-2. Enter the command `setpath` and provide the path to the input text file.
-3. Enter the command `extract` to extract the URLs from the input file.
-4. Enter the command `save` to save the extracted URLs to a new file.
-5. Enter the command `print` to print the extracted URLs to the terminal.
+2. Enter the command `setpath` and provide the path to the input text file.This command will ask prompt an input to enter the file path.
+3. Enter the command `seturl` and provide the url from which it to be extracted.This command will ask prompt an input to enter the url.
+4. Enter the command `extract` to extract the URLs from the input file.
+5. Enter the command `save` to save the extracted URLs to a new file.
+6. Enter the command `print` to print the extracted URLs to the terminal.
 
 ## Requirements
 
